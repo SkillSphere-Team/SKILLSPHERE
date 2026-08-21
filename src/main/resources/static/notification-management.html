@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SkillSphere - Notification Management</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+</head>
+
+
+<body class="bg-light">
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar navbar-dark bg-primary">
+
+    <div class="container">
+
+        <span class="navbar-brand fw-bold">
+            SkillSphere - Notification Management
+        </span>
+
+        <a href="/admin-dashboard.html"
+           class="btn btn-light">
+
+            Admin Dashboard
+
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- ================= MAIN ================= -->
+
+<div class="container mt-5">
+
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold">
+            🔔 Notification Management
+        </h2>
+
+        <p class="text-muted">
+            Create and send notifications to SkillSphere users.
+        </p>
+
+    </div>
+
+
+    <!-- ================= CREATE NOTIFICATION ================= -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h4 class="mb-4">
+                📢 Create Notification
+            </h4>
+
+
+            <form id="notificationForm">
+
+
+              <!-- NOTIFICATION MODE -->
+
+<div class="mb-3">
+    <label class="form-label fw-bold">
+        Notification Mode
+    </label>
+
+    <select id="notificationMode" class="form-select">
+        <option value="INDIVIDUAL">👤 Individual User</option>
+        <option value="BULK">👥 Bulk Users</option>
+    </select>
+</div>
+
+
+<!-- INDIVIDUAL USER -->
+
+<div class="mb-3" id="individualUserSection">
+
+    <label class="form-label fw-bold">
+        User ID
+    </label>
+
+    <input
+        type="number"
+        id="userId"
+        class="form-control"
+        placeholder="Enter user ID">
+
+    <div class="form-text">
+        Enter the user ID who should receive this notification.
+    </div>
+
+</div>
+
+
+<!-- BULK USERS -->
+
+<div class="mb-3 d-none" id="bulkUserSection">
+
+    <label class="form-label fw-bold">
+        User IDs
+    </label>
+
+    <textarea
+        id="userIds"
+        class="form-control"
+        rows="3"
+        placeholder="Enter user IDs separated by commas&#10;Example: 1,2,3,4,5"></textarea>
+
+    <div class="form-text">
+        Enter multiple user IDs separated by commas.
+    </div>
+
+</div>
+
+
+                <!-- TITLE -->
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="title"
+                        class="form-control"
+                        placeholder="Enter notification title"
+                        maxlength="150"
+                        required>
+
+                </div>
+
+
+                <!-- MESSAGE -->
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Message
+                    </label>
+
+                    <textarea
+                        id="message"
+                        class="form-control"
+                        rows="4"
+                        placeholder="Enter notification message"
+                        required>
+                    </textarea>
+
+                </div>
+
+
+                <!-- TYPE -->
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Notification Type
+                    </label>
+
+                    <select
+                        id="type"
+                        class="form-select"
+                        required>
+
+                        <option value="GENERAL">
+                            🔔 General
+                        </option>
+
+                        <option value="ANNOUNCEMENT">
+                            📢 Announcement
+                        </option>
+
+                        <option value="PAYMENT_DUE">
+                            💰 Payment Due
+                        </option>
+
+                        <option value="CERTIFICATE_GENERATED">
+                            🏆 Certificate Generated
+                        </option>
+
+                        <option value="ASSIGNMENT_DEADLINE">
+                            📝 Assignment Deadline
+                        </option>
+
+                        <option value="EXAM_SCHEDULED">
+                            🧪 Exam Scheduled
+                        </option>
+
+                        <option value="EXAM_RESULT">
+                            📊 Exam Result
+                        </option>
+
+                        <option value="LOW_ATTENDANCE">
+                            ⚠️ Low Attendance
+                        </option>
+
+                        <option value="PASSWORD_RESET">
+                            🔐 Password Reset
+                        </option>
+
+                        <option value="BATCH_ANNOUNCEMENT">
+                            📦 Batch Announcement
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- PRIORITY -->
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Priority
+                    </label>
+
+                    <select
+                        id="priority"
+                        class="form-select"
+                        required>
+
+                        <option value="LOW">
+                            Low
+                        </option>
+
+                        <option value="NORMAL" selected>
+                            Normal
+                        </option>
+
+                        <option value="HIGH">
+                            High
+                        </option>
+
+                        <option value="URGENT">
+                            Urgent
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- CHANNEL -->
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Notification Channel
+                    </label>
+
+                    <select
+                        id="channel"
+                        class="form-select"
+                        required>
+
+                        <option value="IN_APP">
+                            🔔 In-App
+                        </option>
+
+                        <option value="EMAIL">
+                            📧 Email
+                        </option>
+
+                        <option value="BOTH">
+                            🔔📧 In-App + Email
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- SCHEDULE -->
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Schedule Notification
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        id="scheduledAt"
+                        class="form-control">
+
+                    <div class="form-text">
+                        Leave empty to send immediately.
+                    </div>
+
+                </div>
+
+
+                <!-- SUBMIT -->
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+
+                    🔔 Send Notification
+
+                </button>
+
+
+                <button
+                    type="reset"
+                    class="btn btn-secondary ms-2">
+
+                    Clear
+
+                </button>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= RESULT ================= -->
+
+    <div id="result"
+         class="mb-4">
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+/* ==========================================
+   LOGIN CHECK
+========================================== */
+
+const accessToken =
+    localStorage.getItem("accessToken");
+
+const userData =
+    JSON.parse(localStorage.getItem("user"));
+
+
+if (!accessToken || !userData) {
+
+    window.location.href =
+        "/login.html";
+
+}
+
+
+
+/* ==========================================
+   CREATE INDIVIDUAL / BULK NOTIFICATION
+========================================== */
+
+document.getElementById("notificationForm")
+    .addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+
+        const mode =
+            document.getElementById("notificationMode").value;
+
+
+        const title =
+            document.getElementById("title").value;
+
+
+        const message =
+            document.getElementById("message").value;
+
+
+        const type =
+            document.getElementById("type").value;
+
+
+        const priority =
+            document.getElementById("priority").value;
+
+
+        const channel =
+            document.getElementById("channel").value;
+
+
+        const scheduledAt =
+            document.getElementById("scheduledAt").value;
+
+
+        const formattedScheduledAt =
+            scheduledAt
+                ? new Date(scheduledAt).toISOString()
+                : null;
+
+
+        try {
+
+            let response;
+
+
+            /* ==========================================
+               INDIVIDUAL NOTIFICATION
+            ========================================== */
+
+            if (mode === "INDIVIDUAL") {
+
+                const userId =
+                    document.getElementById("userId").value;
+
+
+                if (!userId) {
+
+                    throw new Error(
+                        "Please enter a User ID"
+                    );
+
+                }
+
+
+                const notification = {
+
+                    userId: Number(userId),
+
+                    title: title,
+
+                    message: message,
+
+                    type: type,
+
+                    priority: priority,
+
+                    channel: channel,
+
+                    scheduledAt:
+                        formattedScheduledAt
+
+                };
+
+
+                response = await fetch(
+                    "/api/notifications",
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json",
+
+                            "Authorization":
+                                "Bearer " + accessToken
+
+                        },
+
+                        body:
+                            JSON.stringify(notification)
+
+                    }
+                );
+
+            }
+
+
+            /* ==========================================
+               BULK NOTIFICATION
+            ========================================== */
+
+            else {
+
+                const userIdsText =
+                    document.getElementById("userIds").value;
+
+
+                if (!userIdsText.trim()) {
+
+                    throw new Error(
+                        "Please enter User IDs"
+                    );
+
+                }
+
+
+                const userIds =
+                    userIdsText
+                        .split(",")
+                        .map(id => Number(id.trim()))
+                        .filter(id => !isNaN(id));
+
+
+                if (userIds.length === 0) {
+
+                    throw new Error(
+                        "Please enter valid User IDs"
+                    );
+
+                }
+
+
+                const bulkNotification = {
+
+                    userIds: userIds,
+
+                    title: title,
+
+                    message: message,
+
+                    type: type,
+
+                    priority: priority,
+
+                    channel: channel,
+
+                    scheduledAt:
+                        formattedScheduledAt
+
+                };
+
+
+                response = await fetch(
+                    "/api/notifications/bulk",
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json",
+
+                            "Authorization":
+                                "Bearer " + accessToken
+
+                        },
+
+                        body:
+                            JSON.stringify(
+                                bulkNotification
+                            )
+
+                    }
+                );
+
+            }
+
+
+            /* ==========================================
+               RESPONSE
+            ========================================== */
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Failed to send notification"
+                );
+
+            }
+
+
+            /* ==========================================
+               SUCCESS MESSAGE
+            ========================================== */
+
+            if (mode === "INDIVIDUAL") {
+
+                document.getElementById("result")
+                    .innerHTML = `
+
+                    <div class="alert alert-success">
+
+                        <strong>
+                            ✅ Notification sent successfully!
+                        </strong>
+
+                        <br>
+
+                        Notification ID:
+                        ${data.id}
+
+                    </div>
+
+                `;
+
+            } else {
+
+                document.getElementById("result")
+                    .innerHTML = `
+
+                    <div class="alert alert-success">
+
+                        <strong>
+                            ✅ Bulk notification sent successfully!
+                        </strong>
+
+                        <br>
+
+                        Notifications sent to:
+                        <strong>
+                            ${userIdsText.split(",").length}
+                        </strong>
+                        users
+
+                    </div>
+
+                `;
+
+            }
+
+
+            /* ==========================================
+               RESET FORM
+            ========================================== */
+
+            document.getElementById(
+                "notificationForm"
+            ).reset();
+
+
+            notificationMode.value =
+                "INDIVIDUAL";
+
+
+            individualUserSection
+                .classList.remove("d-none");
+
+
+            bulkUserSection
+                .classList.add("d-none");
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            document.getElementById("result")
+                .innerHTML = `
+
+                <div class="alert alert-danger">
+
+                    ❌ ${error.message}
+
+                </div>
+
+            `;
+
+        }
+
+    });
+        
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>SkillSphere - Certification Management</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+</head>
+
+
+<body class="bg-light">
+
+
+    <!-- ============================== -->
+    <!-- Navbar -->
+    <!-- ============================== -->
+
+    <nav class="navbar navbar-dark bg-dark">
+
+        <div class="container">
+
+            <span class="navbar-brand fw-bold">
+                SkillSphere - Admin
+            </span>
+
+            <a
+                href="/admin-dashboard.html"
+                class="btn btn-light">
+
+                Dashboard
+
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ============================== -->
+    <!-- Main Container -->
+    <!-- ============================== -->
+
+    <div class="container mt-5">
+
+
+        <!-- Page Heading -->
+
+        <div class="mb-4">
+
+            <h2 class="fw-bold">
+                🏆 Certification Management
+            </h2>
+
+            <p class="text-muted">
+                View and manage certificates issued to SkillSphere students.
+            </p>
+
+        </div>
+
+
+        <!-- ============================== -->
+        <!-- Statistics -->
+        <!-- ============================== -->
+
+        <div class="row g-4 mb-5">
+
+
+            <!-- Total Certificates -->
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm border-0 h-100">
+
+                    <div class="card-body">
+
+                        <h6 class="text-muted">
+                            Total Certificates
+                        </h6>
+
+                        <h2
+                            id="totalCertificates"
+                            class="fw-bold">
+
+                            -
+
+                        </h2>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Active Certificates -->
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm border-0 h-100">
+
+                    <div class="card-body">
+
+                        <h6 class="text-muted">
+                            Active Certificates
+                        </h6>
+
+                        <h2
+                            id="activeCertificates"
+                            class="fw-bold text-success">
+
+                            -
+
+                        </h2>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Revoked Certificates -->
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm border-0 h-100">
+
+                    <div class="card-body">
+
+                        <h6 class="text-muted">
+                            Revoked Certificates
+                        </h6>
+
+                        <h2
+                            id="revokedCertificates"
+                            class="fw-bold text-danger">
+
+                            -
+
+                        </h2>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ============================== -->
+        <!-- Search -->
+        <!-- ============================== -->
+
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-body">
+
+                <div class="row g-3 align-items-end">
+
+
+                    <div class="col-md-8">
+
+                        <label
+                            class="form-label fw-bold">
+
+                            Search Certificate
+
+                        </label>
+
+                        <input
+                            type="text"
+                            id="searchInput"
+                            class="form-control"
+                            placeholder="Search by student, certificate ID or course">
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <button
+                            class="btn btn-primary w-100"
+                            onclick="searchCertificates()">
+
+                            🔍 Search
+
+                        </button>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================== -->
+        <!-- Error Message -->
+        <!-- ============================== -->
+
+        <div
+            id="errorMessage"
+            class="alert alert-danger d-none">
+
+        </div>
+
+
+        <!-- ============================== -->
+        <!-- Certificates Table -->
+        <!-- ============================== -->
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body">
+
+                <h5 class="fw-bold mb-3">
+                    Certificate Records
+                </h5>
+
+
+                <div class="table-responsive">
+
+                    <table
+                        class="table table-hover align-middle">
+
+                        <thead class="table-primary">
+
+                            <tr>
+
+                                <th>
+                                    Certificate ID
+                                </th>
+
+                                <th>
+                                    Student
+                                </th>
+
+                                <th>
+                                    Course
+                                </th>
+
+                                <th>
+                                    Issue Date
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="certificatesTable">
+
+                            <tr>
+
+                                <td
+                                    colspan="6"
+                                    class="text-center">
+
+                                    Loading certificates...
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ============================== -->
+    <!-- JavaScript -->
+    <!-- ============================== -->
+
+    <script>
+
+
+        // ==========================================
+        // JWT
+        // ==========================================
+
+        const accessToken =
+            localStorage.getItem("accessToken");
+
+        const userData =
+            localStorage.getItem("user");
+
+
+        // ==========================================
+        // Login Check
+        // ==========================================
+
+        if (!accessToken || !userData) {
+
+            window.location.href =
+                "/login.html";
+
+        }
+
+
+        // ==========================================
+        // Certificate Data
+        // ==========================================
+
+        let certificates = [];
+
+
+        // ==========================================
+        // Load Certificates
+        // ==========================================
+
+        async function loadCertificates() {
+
+            try {
+
+                /*
+                 * M4's actual CertificateController
+                 * endpoint will be connected here.
+                 *
+                 * DO NOT assume the endpoint yet.
+                 */
+
+                const response =
+                    await fetch(
+                        "/api/certificates",
+                        {
+                            method: "GET",
+
+                            headers: {
+                                "Authorization":
+                                    "Bearer " +
+                                    accessToken,
+
+                                "Content-Type":
+                                    "application/json"
+                            }
+                        }
+                    );
+
+
+                // ==================================
+                // Unauthorized
+                // ==================================
+
+                if (response.status === 401) {
+
+                    localStorage.removeItem(
+                        "accessToken"
+                    );
+
+                    localStorage.removeItem(
+                        "user"
+                    );
+
+                    window.location.href =
+                        "/login.html";
+
+                    return;
+
+                }
+
+
+                // ==================================
+                // Forbidden
+                // ==================================
+
+                if (response.status === 403) {
+
+                    showError(
+                        "Access denied. ADMIN permission required."
+                    );
+
+                    return;
+
+                }
+
+
+                // ==================================
+                // Other Errors
+                // ==================================
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Unable to load certificates."
+                    );
+
+                }
+
+
+                certificates =
+                    await response.json();
+
+
+                console.log(
+                    "Certificates received:",
+                    certificates
+                );
+
+
+                displayCertificates(
+                    certificates
+                );
+
+
+                updateStatistics(
+                    certificates
+                );
+
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Certificate loading error:",
+                    error
+                );
+
+                showError(
+                    "Unable to load certificates: " +
+                    error.message
+                );
+
+            }
+
+        }
+
+
+        // ==========================================
+        // Display Certificates
+        // ==========================================
+
+        function displayCertificates(
+            data
+        ) {
+
+            const table =
+                document.getElementById(
+                    "certificatesTable"
+                );
+
+
+            table.innerHTML = "";
+
+
+            // ==================================
+            // No Records
+            // ==================================
+
+            if (
+                !data ||
+                data.length === 0
+            ) {
+
+                table.innerHTML = `
+
+                    <tr>
+
+                        <td
+                            colspan="6"
+                            class="text-center text-muted">
+
+                            No certificates found.
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+                return;
+
+            }
+
+
+            // ==================================
+            // Display Records
+            // ==================================
+
+            data.forEach(
+                function(certificate) {
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+
+                    const status =
+                        String(
+                            certificate.status ||
+                            "ACTIVE"
+                        ).toUpperCase();
+
+
+                    let statusBadge;
+
+
+                    if (
+                        status === "ACTIVE"
+                    ) {
+
+                        statusBadge = `
+                            <span
+                                class="badge bg-success">
+
+                                ACTIVE
+
+                            </span>
+                        `;
+
+                    }
+                    else {
+
+                        statusBadge = `
+                            <span
+                                class="badge bg-danger">
+
+                                ${status}
+
+                            </span>
+                        `;
+
+                    }
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${
+                                certificate.id ??
+                                certificate.certificateId ??
+                                "-"
+                            }
+                        </td>
+
+                        <td>
+                            ${
+                                certificate.studentName ??
+                                certificate.studentId ??
+                                "-"
+                            }
+                        </td>
+
+                        <td>
+                            ${
+                                certificate.courseName ??
+                                certificate.courseId ??
+                                "-"
+                            }
+                        </td>
+
+                        <td>
+                            ${
+                                certificate.issueDate ??
+                                "-"
+                            }
+                        </td>
+
+                        <td>
+                            ${statusBadge}
+                        </td>
+
+                        <td>
+
+                            <button
+                                class="btn btn-sm btn-primary"
+                                onclick="viewCertificate(
+                                    ${
+                                        certificate.id ??
+                                        certificate.certificateId
+                                    }
+                                )">
+
+                                👁️ View
+
+                            </button>
+
+                            <button
+                                class="btn btn-sm btn-danger"
+                                onclick="revokeCertificate(
+                                    ${
+                                        certificate.id ??
+                                        certificate.certificateId
+                                    }
+                                )">
+
+                                🚫 Revoke
+
+                            </button>
+
+                        </td>
+
+                    `;
+
+
+                    table.appendChild(row);
+
+                }
+            );
+
+        }
+
+
+        // ==========================================
+        // Statistics
+        // ==========================================
+
+        function updateStatistics(
+            data
+        ) {
+
+            const total =
+                data.length;
+
+
+            const active =
+                data.filter(
+                    certificate =>
+                        String(
+                            certificate.status ||
+                            "ACTIVE"
+                        ).toUpperCase()
+                        === "ACTIVE"
+                ).length;
+
+
+            const revoked =
+                data.filter(
+                    certificate =>
+                        String(
+                            certificate.status ||
+                            ""
+                        ).toUpperCase()
+                        === "REVOKED"
+                ).length;
+
+
+            document
+                .getElementById(
+                    "totalCertificates"
+                )
+                .textContent =
+                total;
+
+
+            document
+                .getElementById(
+                    "activeCertificates"
+                )
+                .textContent =
+                active;
+
+
+            document
+                .getElementById(
+                    "revokedCertificates"
+                )
+                .textContent =
+                revoked;
+
+        }
+
+
+        // ==========================================
+        // Search
+        // ==========================================
+
+        function searchCertificates() {
+
+            const search =
+                document
+                    .getElementById(
+                        "searchInput"
+                    )
+                    .value
+                    .toLowerCase()
+                    .trim();
+
+
+            if (!search) {
+
+                displayCertificates(
+                    certificates
+                );
+
+                return;
+
+            }
+
+
+            const filtered =
+                certificates.filter(
+                    function(certificate) {
+
+                        return (
+
+                            String(
+                                certificate.id ??
+                                certificate.certificateId ??
+                                ""
+                            )
+                            .toLowerCase()
+                            .includes(search)
+
+                            ||
+
+                            String(
+                                certificate.studentName ??
+                                certificate.studentId ??
+                                ""
+                            )
+                            .toLowerCase()
+                            .includes(search)
+
+                            ||
+
+                            String(
+                                certificate.courseName ??
+                                certificate.courseId ??
+                                ""
+                            )
+                            .toLowerCase()
+                            .includes(search)
+
+                        );
+
+                    }
+                );
+
+
+            displayCertificates(
+                filtered
+            );
+
+        }
+
+
+        // ==========================================
+        // View Certificate
+        // ==========================================
+
+        function viewCertificate(id) {
+
+            alert(
+                "View certificate ID: " +
+                id
+            );
+
+        }
+
+
+        // ==========================================
+        // Revoke Certificate
+        // ==========================================
+
+        function revokeCertificate(id) {
+
+            const confirmed =
+                confirm(
+                    "Are you sure you want to revoke certificate ID " +
+                    id +
+                    "?"
+                );
+
+
+            if (!confirmed) {
+
+                return;
+
+            }
+
+
+            /*
+             * We will connect the actual
+             * M4 revoke endpoint after
+             * checking CertificateController.
+             */
+
+            alert(
+                "Revoke API will be connected after confirming M4's endpoint."
+            );
+
+        }
+
+
+        // ==========================================
+        // Error
+        // ==========================================
+
+        function showError(
+            message
+        ) {
+
+            const error =
+                document.getElementById(
+                    "errorMessage"
+                );
+
+
+            error.textContent =
+                message;
+
+
+            error.classList.remove(
+                "d-none"
+            );
+
+        }
+
+
+        // ==========================================
+        // Load Page
+        // ==========================================
+
+        loadCertificates();
+
+
+    </script>
+
+
+</body>
+
+</html>

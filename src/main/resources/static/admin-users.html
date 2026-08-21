@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SkillSphere - User Management</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+        <style>
+
+    th,
+    td {
+        min-width: 120px;
+    }
+
+    th:first-child,
+    td:first-child {
+        min-width: 60px;
+    }
+
+</style>
+
+</head>
+
+<body class="bg-light">
+
+
+    <!-- Navbar -->
+
+    <nav class="navbar navbar-dark bg-primary">
+
+        <div class="container">
+
+            <span class="navbar-brand fw-bold">
+                SkillSphere - Admin
+            </span>
+
+            <a
+                href="/admin-dashboard.html"
+                class="btn btn-light">
+
+                Dashboard
+
+            </a>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- Main Content -->
+
+    <div class="container mt-5">
+
+        <div class="card shadow border-0">
+
+            <div class="card-body p-4">
+
+                <h2 class="fw-bold mb-4">
+                    👥 User Management
+                </h2>
+
+
+                <!-- Error Message -->
+
+                <div
+                    id="errorMessage"
+                    class="alert alert-danger d-none">
+                </div>
+
+
+
+                <!-- Users Table -->
+
+                <div class="table-responsive">
+<table class="table table-hover align-middle text-nowrap">
+
+                        <thead class="table-primary">
+
+                            <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Phone</th>
+    <th>Status</th>
+    <th>Roles</th>
+    <th>Actions</th>
+</tr>
+
+                        </thead>
+
+
+                        <tbody id="usersTable">
+
+                            <tr>
+
+                                <td
+                                    colspan="7"
+                                    class="text-center">
+
+                                    Loading users...
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+<script>
+
+    // ==========================================
+    // Get JWT Token
+    // ==========================================
+
+    const accessToken =
+        localStorage.getItem("accessToken");
+
+    const userData =
+        localStorage.getItem("user");
+
+
+    // ==========================================
+    // Check Login
+    // ==========================================
+
+    if (!accessToken || !userData) {
+
+        window.location.href =
+            "/login.html";
+
+    }
+
+
+    // ==========================================
+    // Load Users
+    // ==========================================
+
+    async function loadUsers() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/users",
+                    {
+                        method: "GET",
+
+                        headers: {
+
+                            "Authorization":
+                                "Bearer " + accessToken,
+
+                            "Content-Type":
+                                "application/json"
+
+                        }
+
+                    }
+                );
+
+
+            // ==================================
+            // Unauthorized
+            // ==================================
+
+            if (response.status === 401) {
+
+                localStorage.removeItem(
+                    "accessToken"
+                );
+
+                localStorage.removeItem(
+                    "user"
+                );
+
+                window.location.href =
+                    "/login.html";
+
+                return;
+
+            }
+
+
+            // ==================================
+            // Forbidden
+            // ==================================
+
+            if (response.status === 403) {
+
+                document
+                    .getElementById("errorMessage")
+                    .textContent =
+                    "Access denied. ADMIN permission required.";
+
+                document
+                    .getElementById("errorMessage")
+                    .classList
+                    .remove("d-none");
+
+                return;
+
+            }
+
+
+            // ==================================
+            // Other Errors
+            // ==================================
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to load users."
+                );
+
+            }
+
+
+            // ==================================
+            // Convert Response to JSON
+            // ==================================
+
+            const users =
+                await response.json();
+
+
+            console.log(
+                "Users received:",
+                users
+            );
+
+
+            // ==================================
+            // Get Table
+            // ==================================
+
+            const usersTable =
+                document.getElementById(
+                    "usersTable"
+                );
+
+
+            usersTable.innerHTML = "";
+
+
+            // ==================================
+            // No Users
+            // ==================================
+
+            if (!users || users.length === 0) {
+
+                usersTable.innerHTML = `
+
+                    <tr>
+
+                        <td
+                            colspan="7"
+                            class="text-center text-muted">
+
+                            No users found.
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+                return;
+
+            }
+
+
+            // ==================================
+            // Display Users
+            // ==================================
+
+            users.forEach(function(user) {
+
+                const row =
+                    document.createElement("tr");
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${user.id}
+                    </td>
+
+
+                    <td>
+                        ${user.firstName || ""}
+                        ${user.lastName || ""}
+                    </td>
+
+
+                    <td>
+                        ${user.email || ""}
+                    </td>
+
+
+                    <td>
+                        ${user.phone || "-"}
+                    </td>
+
+
+                    <td>
+
+                        ${
+                            user.active
+
+                            ? `<span class="badge bg-success">
+                                   Active
+                               </span>`
+
+                            : `<span class="badge bg-danger">
+                                   Inactive
+                               </span>`
+                        }
+
+                    </td>
+
+
+                    <td>
+
+                        ${
+                            user.roles &&
+                            user.roles.length > 0
+
+                            ? user.roles
+                                .map(role => role.name)
+                                .join(", ")
+
+                            : "No Role"
+                        }
+
+                    </td>
+
+
+                    <!-- ACTIONS -->
+
+                    <td>
+
+                        <button
+                            class="btn btn-sm btn-primary mb-1"
+                            onclick="editUser(${user.id})">
+
+                            ✏️ Edit
+
+                        </button>
+
+
+                        <button
+                            class="btn btn-sm btn-warning mb-1"
+                            onclick="toggleUserStatus(${user.id}, ${user.active})">
+
+                            ${
+                                user.active
+                                ? "🔄 Deactivate"
+                                : "🔄 Activate"
+                            }
+
+                        </button>
+
+
+                        <button
+                            class="btn btn-sm btn-danger mb-1"
+                            onclick="deleteUser(${user.id})">
+
+                            🗑️ Delete
+
+                        </button>
+
+
+                        <button
+                            class="btn btn-sm btn-secondary mb-1"
+                            onclick="changeRole(${user.id})">
+
+                            🔐 Change Role
+
+                        </button>
+
+                    </td>
+
+                `;
+
+
+                usersTable.appendChild(row);
+
+            });
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+                "User loading error:",
+                error
+            );
+
+
+            const errorMessage =
+                document.getElementById(
+                    "errorMessage"
+                );
+
+
+            errorMessage.textContent =
+                "Unable to load users: "
+                + error.message;
+
+
+            errorMessage.classList.remove(
+                "d-none"
+            );
+
+        }
+
+    }
+
+
+    // ==========================================
+    // User Management Actions
+    // ==========================================
+
+  async function editUser(id) {
+
+    try {
+
+        const response = await fetch(
+            `/api/users/${id}`,
+            {
+                method: "GET",
+
+                headers: {
+                    "Authorization":
+                        "Bearer " + accessToken
+                }
+            }
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to load user details."
+            );
+
+        }
+
+
+        const user =
+            await response.json();
+
+
+        // Fill modal
+
+        document.getElementById(
+            "editUserId"
+        ).value = user.id;
+
+
+        document.getElementById(
+            "editFirstName"
+        ).value = user.firstName || "";
+
+
+        document.getElementById(
+            "editLastName"
+        ).value = user.lastName || "";
+
+
+        document.getElementById(
+            "editEmail"
+        ).value = user.email || "";
+
+
+        // Open modal
+
+        const modal =
+            new bootstrap.Modal(
+                document.getElementById(
+                    "editUserModal"
+                )
+            );
+
+
+        modal.show();
+
+
+    } catch (error) {
+
+        console.error(
+            "Edit user error:",
+            error
+        );
+
+        alert(
+            "Unable to load user: "
+            + error.message
+        );
+
+    }
+
+}
+    
+  async function saveUserChanges() {
+
+	    const id =
+	        document.getElementById(
+	            "editUserId"
+	        ).value;
+
+
+	    const firstName =
+	        document.getElementById(
+	            "editFirstName"
+	        ).value.trim();
+
+
+	    const lastName =
+	        document.getElementById(
+	            "editLastName"
+	        ).value.trim();
+
+
+	    const email =
+	        document.getElementById(
+	            "editEmail"
+	        ).value.trim();
+
+
+	    if (!firstName || !lastName || !email) {
+
+	        alert(
+	            "Please fill all fields."
+	        );
+
+	        return;
+
+	    }
+
+
+	    try {
+
+	        const response = await fetch(
+	            `/api/users/${id}`,
+	            {
+	                method: "PUT",
+
+	                headers: {
+
+	                    "Authorization":
+	                        "Bearer " + accessToken,
+
+	                    "Content-Type":
+	                        "application/json"
+
+	                },
+
+	                body: JSON.stringify({
+
+	                    firstName: firstName,
+
+	                    lastName: lastName,
+
+	                    email: email
+
+	                })
+
+	            }
+	        );
+
+
+	        if (response.status === 401) {
+
+	            localStorage.removeItem(
+	                "accessToken"
+	            );
+
+	            localStorage.removeItem(
+	                "user"
+	            );
+
+	            window.location.href =
+	                "/login.html";
+
+	            return;
+
+	        }
+
+
+	        if (response.status === 403) {
+
+	            alert(
+	                "Access denied. ADMIN permission required."
+	            );
+
+	            return;
+
+	        }
+
+
+	        if (!response.ok) {
+
+	            const error =
+	                await response.json();
+
+	            throw new Error(
+	                error.message ||
+	                "Unable to update user."
+	            );
+
+	        }
+
+
+	        alert(
+	            "User updated successfully!"
+	        );
+
+
+	        // Close modal
+
+	        const modalElement =
+	            document.getElementById(
+	                "editUserModal"
+	            );
+
+
+	        const modal =
+	            bootstrap.Modal.getInstance(
+	                modalElement
+	            );
+
+
+	        modal.hide();
+
+
+	        // Refresh table
+
+	        await loadUsers();
+
+
+	    } catch (error) {
+
+	        console.error(
+	            "Update user error:",
+	            error
+	        );
+
+	        alert(
+	            "Unable to update user: "
+	            + error.message
+	        );
+
+	    }
+
+	}
+
+  async function toggleUserStatus(id, active) {
+
+	    const action =
+	        active ? "deactivate" : "activate";
+
+	    const confirmed = confirm(
+	        `Are you sure you want to ${action} this user?`
+	    );
+
+	    if (!confirmed) {
+	        return;
+	    }
+
+	    try {
+
+	        const response = await fetch(
+	            `/api/users/${id}/status?active=${!active}`,
+	            {
+	                method: "PUT",
+
+	                headers: {
+	                    "Authorization":
+	                        "Bearer " + accessToken
+	                }
+	            }
+	        );
+
+
+	        if (response.status === 401) {
+
+	            localStorage.removeItem("accessToken");
+	            localStorage.removeItem("user");
+
+	            window.location.href =
+	                "/login.html";
+
+	            return;
+	        }
+
+
+	        if (response.status === 403) {
+
+	            alert(
+	                "Access denied. ADMIN permission required."
+	            );
+
+	            return;
+	        }
+
+
+	        if (!response.ok) {
+
+	            const errorText =
+	                await response.text();
+
+	            throw new Error(errorText);
+	        }
+
+
+	        alert(
+	            `User ${action}d successfully!`
+	        );
+
+
+	        // Refresh table
+
+	        await loadUsers();
+
+	    }
+	    catch (error) {
+
+	        console.error(
+	            "Status update error:",
+	            error
+	        );
+
+	        alert(
+	            "Unable to update user status: "
+	            + error.message
+	        );
+
+	    }
+	}
+
+
+    async function deleteUser(id) {
+
+        const confirmed =
+            confirm(
+                "Are you sure you want to delete this user?"
+            );
+
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+
+        alert(
+            "Delete user ID: " + id
+        );
+
+    }
+
+
+    function changeRole(id) {
+
+        document.getElementById(
+            "roleUserId"
+        ).value = id;
+
+        const modal =
+            new bootstrap.Modal(
+                document.getElementById(
+                    "changeRoleModal"
+                )
+            );
+
+        modal.show();
+    }
+    async function saveUserRole() {
+
+        const id =
+            document.getElementById(
+                "roleUserId"
+            ).value;
+
+        const role =
+            document.getElementById(
+                "roleSelect"
+            ).value;
+
+        try {
+
+            const response = await fetch(
+                `/api/users/${id}/role?role=${role}`,
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " + accessToken
+                    }
+                }
+            );
+
+            if (response.status === 401) {
+
+                localStorage.removeItem(
+                    "accessToken"
+                );
+
+                localStorage.removeItem(
+                    "user"
+                );
+
+                window.location.href =
+                    "/login.html";
+
+                return;
+            }
+
+            if (response.status === 403) {
+
+                alert(
+                    "Access denied. ADMIN permission required."
+                );
+
+                return;
+            }
+
+            if (!response.ok) {
+
+                const errorText =
+                    await response.text();
+
+                throw new Error(errorText);
+            }
+
+            alert(
+                "User role updated successfully!"
+            );
+
+            const modalElement =
+                document.getElementById(
+                    "changeRoleModal"
+                );
+
+            const modal =
+                bootstrap.Modal.getInstance(
+                    modalElement
+                );
+
+            modal.hide();
+
+            await loadUsers();
+
+        } catch (error) {
+
+            console.error(
+                "Change role error:",
+                error
+            );
+
+            alert(
+                "Unable to change role: "
+                + error.message
+            );
+        }
+    }
+
+
+    // ==========================================
+    // Load Users When Page Opens
+    // ==========================================
+
+    loadUsers();
+
+</script>
+
+<!-- ============================= -->
+<!-- Edit User Modal -->
+<!-- ============================= -->
+
+<div
+    class="modal fade"
+    id="editUserModal"
+    tabindex="-1"
+    aria-hidden="true">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    ✏️ Edit User
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <input
+                    type="hidden"
+                    id="editUserId">
+
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        First Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="editFirstName"
+                        class="form-control">
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Last Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="editLastName"
+                        class="form-control">
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="editEmail"
+                        class="form-control">
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="saveUserChanges()">
+
+                    Save Changes
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Bootstrap JS -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+<!-- Change Role Modal -->
+
+<div
+    class="modal fade"
+    id="changeRoleModal"
+    tabindex="-1"
+    aria-hidden="true">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    🔐 Change User Role
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input
+                    type="hidden"
+                    id="roleUserId">
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Select Role
+                    </label>
+
+                    <select
+                        id="roleSelect"
+                        class="form-select">
+
+                        <option value="ADMIN">
+                            ADMIN
+                        </option>
+
+                        <option value="TRAINER">
+                            TRAINER
+                        </option>
+
+                        <option value="STUDENT">
+                            STUDENT
+                        </option>
+
+                        <option value="HR">
+                            HR
+                        </option>
+
+                        <option value="EVALUATOR">
+                            EVALUATOR
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="saveUserRole()">
+
+                    Save Role
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+</body>
+
+</html>

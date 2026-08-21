@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SkillSphere - Reports</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+</head>
+
+
+<body class="bg-light">
+
+
+    <!-- Navbar -->
+
+    <nav class="navbar navbar-dark bg-primary">
+
+        <div class="container">
+
+            <span class="navbar-brand fw-bold">
+                SkillSphere - Reports
+            </span>
+
+            <a
+                href="/admin-dashboard.html"
+                class="btn btn-light">
+
+                Dashboard
+
+            </a>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- Main Content -->
+
+    <div class="container mt-5">
+
+        <h2 class="fw-bold mb-4">
+            📊 Reports
+        </h2>
+
+
+        <!-- User Summary -->
+
+        <h4 class="mb-3">
+            👥 User Report
+        </h4>
+
+
+        <div class="row g-4 mb-5">
+
+
+            <!-- Total Users -->
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-body">
+
+                        <h6 class="text-muted">
+                            Total Users
+                        </h6>
+
+                        <h2
+                            id="totalUsers"
+                            class="fw-bold">
+
+                            -
+
+                        </h2>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Active Users -->
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-body">
+
+                        <h6 class="text-muted">
+                            Active Users
+                        </h6>
+
+                        <h2
+                            id="activeUsers"
+                            class="fw-bold text-success">
+
+                            -
+
+                        </h2>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Inactive Users -->
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-body">
+
+                        <h6 class="text-muted">
+                            Inactive Users
+                        </h6>
+
+                        <h2
+                            id="inactiveUsers"
+                            class="fw-bold text-danger">
+
+                            -
+
+                        </h2>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Roles -->
+
+        <h4 class="mb-3">
+            🔐 Users by Role
+        </h4>
+
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body">
+
+
+                <div class="row g-4">
+
+
+                    <!-- Admin -->
+
+                    <div class="col-md-6">
+
+                        <div class="border rounded p-3">
+
+                            <div
+                                class="d-flex justify-content-between">
+
+                                <span>
+                                    👑 ADMIN
+                                </span>
+
+                                <strong
+                                    id="adminCount">
+
+                                    -
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Trainer -->
+
+                    <div class="col-md-6">
+
+                        <div class="border rounded p-3">
+
+                            <div
+                                class="d-flex justify-content-between">
+
+                                <span>
+                                    👨‍🏫 TRAINER
+                                </span>
+
+                                <strong
+                                    id="trainerCount">
+
+                                    -
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Student -->
+
+                    <div class="col-md-6">
+
+                        <div class="border rounded p-3">
+
+                            <div
+                                class="d-flex justify-content-between">
+
+                                <span>
+                                    🎓 STUDENT
+                                </span>
+
+                                <strong
+                                    id="studentCount">
+
+                                    -
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- HR -->
+
+                    <div class="col-md-6">
+
+                        <div class="border rounded p-3">
+
+                            <div
+                                class="d-flex justify-content-between">
+
+                                <span>
+                                    👔 HR
+                                </span>
+
+                                <strong
+                                    id="hrCount">
+
+                                    -
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Evaluator -->
+
+                    <div class="col-md-6">
+
+                        <div class="border rounded p-3">
+
+                            <div
+                                class="d-flex justify-content-between">
+
+                                <span>
+                                    📝 EVALUATOR
+                                </span>
+
+                                <strong
+                                    id="evaluatorCount">
+
+                                    -
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Error -->
+
+        <div
+            id="errorMessage"
+            class="alert alert-danger d-none mt-4">
+        </div>
+
+
+    </div>
+    
+    <!-- ========================================== -->
+<!-- Payment Report -->
+<!-- ========================================== -->
+
+<h4 class="mb-3 mt-5">
+    💰 Payment Report
+</h4>
+
+
+<!-- Payment Summary -->
+
+<div class="row g-4 mb-5">
+
+    <!-- Total Payments -->
+
+    <div class="col-md-4">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">
+                    Total Payments
+                </h6>
+
+                <h2
+                    id="reportTotalPayments"
+                    class="fw-bold">
+
+                    -
+
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Total Collected -->
+
+    <div class="col-md-4">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">
+                    Total Collected
+                </h6>
+
+                <h2
+                    id="reportTotalCollected"
+                    class="fw-bold text-success">
+
+                    ₹0
+
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Total Balance -->
+
+    <div class="col-md-4">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">
+                    Total Balance
+                </h6>
+
+                <h2
+                    id="reportTotalBalance"
+                    class="fw-bold text-danger">
+
+                    ₹0
+
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Payment Status -->
+
+<h5 class="fw-bold mb-3">
+    Payment Status
+</h5>
+
+<div class="row g-4 mb-5">
+
+
+    <div class="col-md-4">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body">
+
+                <span class="badge bg-success">
+                    PAID
+                </span>
+
+                <h3
+                    id="reportPaidCount"
+                    class="mt-2">
+
+                    0
+
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-md-4">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body">
+
+                <span class="badge bg-warning text-dark">
+                    PARTIAL
+                </span>
+
+                <h3
+                    id="reportPartialCount"
+                    class="mt-2">
+
+                    0
+
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-md-4">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body">
+
+                <span class="badge bg-danger">
+                    PENDING
+                </span>
+
+                <h3
+                    id="reportPendingCount"
+                    class="mt-2">
+
+                    0
+
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Recent Payments -->
+
+<h5 class="fw-bold mb-3">
+    Recent Payments
+</h5>
+
+<div class="card shadow-sm border-0 mb-5">
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover">
+
+                <thead class="table-primary">
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Student ID</th>
+                        <th>Total Fee</th>
+                        <th>Paid</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="reportPaymentsTable">
+
+                    <tr>
+
+                        <td
+                            colspan="6"
+                            class="text-center">
+
+                            Loading payments...
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+    <script>
+
+
+        // ==========================================
+        // JWT
+        // ==========================================
+
+        const accessToken =
+            localStorage.getItem("accessToken");
+
+        const userData =
+            localStorage.getItem("user");
+
+
+        // ==========================================
+        // Login Check
+        // ==========================================
+
+        if (!accessToken || !userData) {
+
+            window.location.href =
+                "/login.html";
+
+        }
+
+
+        // ==========================================
+        // Load Report
+        // ==========================================
+
+        async function loadUserReport() {
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/api/reports/users",
+                        {
+                            method: "GET",
+
+                            headers: {
+
+                                "Authorization":
+                                    "Bearer " + accessToken,
+
+                                "Content-Type":
+                                    "application/json"
+
+                            }
+
+                        }
+                    );
+
+
+                // Unauthorized
+
+                if (response.status === 401) {
+
+                    localStorage.removeItem(
+                        "accessToken"
+                    );
+
+                    localStorage.removeItem(
+                        "user"
+                    );
+
+                    window.location.href =
+                        "/login.html";
+
+                    return;
+
+                }
+
+
+                // Forbidden
+
+                if (response.status === 403) {
+
+                    document
+                        .getElementById("errorMessage")
+                        .textContent =
+                        "Access denied. ADMIN permission required.";
+
+                    document
+                        .getElementById("errorMessage")
+                        .classList
+                        .remove("d-none");
+
+                    return;
+
+                }
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Unable to load report."
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "User Report:",
+                    data
+                );
+
+
+                // ==================================
+                // Summary
+                // ==================================
+
+                document
+                    .getElementById("totalUsers")
+                    .textContent =
+                    data.totalUsers;
+
+
+                document
+                    .getElementById("activeUsers")
+                    .textContent =
+                    data.activeUsers;
+
+
+                document
+                    .getElementById("inactiveUsers")
+                    .textContent =
+                    data.inactiveUsers;
+
+
+                // ==================================
+                // Roles
+                // ==================================
+
+                document
+                    .getElementById("adminCount")
+                    .textContent =
+                    data.adminCount;
+
+
+                document
+                    .getElementById("trainerCount")
+                    .textContent =
+                    data.trainerCount;
+
+
+                document
+                    .getElementById("studentCount")
+                    .textContent =
+                    data.studentCount;
+
+
+                document
+                    .getElementById("hrCount")
+                    .textContent =
+                    data.hrCount;
+
+
+                document
+                    .getElementById("evaluatorCount")
+                    .textContent =
+                    data.evaluatorCount;
+
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Report loading error:",
+                    error
+                );
+
+
+                const errorMessage =
+                    document.getElementById(
+                        "errorMessage"
+                    );
+
+
+                errorMessage.textContent =
+                    "Unable to load report: "
+                    + error.message;
+
+
+                errorMessage.classList.remove(
+                    "d-none"
+                );
+
+            }
+
+        }
+
+
+        // ==========================================
+        // Load Payment Report
+        // ==========================================
+
+        async function loadPaymentReport() {
+
+            try {
+
+                const response = await fetch(
+                    "/api/payments",
+                    {
+                        method: "GET",
+                        headers: {
+                            "Authorization":
+                                "Bearer " + accessToken,
+                            "Content-Type":
+                                "application/json"
+                        }
+                    }
+                );
+
+
+                // ==================================
+                // Unauthorized
+                // ==================================
+
+                if (response.status === 401) {
+
+                    localStorage.removeItem(
+                        "accessToken"
+                    );
+
+                    localStorage.removeItem(
+                        "user"
+                    );
+
+                    window.location.href =
+                        "/login.html";
+
+                    return;
+                }
+
+
+                // ==================================
+                // Forbidden
+                // ==================================
+
+                if (response.status === 403) {
+
+                    document
+                        .getElementById("errorMessage")
+                        .textContent =
+                        "Access denied. ADMIN permission required.";
+
+                    document
+                        .getElementById("errorMessage")
+                        .classList
+                        .remove("d-none");
+
+                    return;
+                }
+
+
+                // ==================================
+                // Other Errors
+                // ==================================
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Unable to load payments."
+                    );
+                }
+
+
+                // ==================================
+                // Convert Response to JSON
+                // ==================================
+
+                const payments =
+                    await response.json();
+
+                console.log(
+                    "Payments received:",
+                    payments
+                );
+
+
+                // ==================================
+                // Payment Table
+                // ==================================
+
+                const paymentsTable =
+                    document.getElementById(
+                        "reportPaymentsTable"
+                    );
+
+                paymentsTable.innerHTML = "";
+
+
+                // ==================================
+                // No Payments
+                // ==================================
+
+                if (
+                    !payments ||
+                    payments.length === 0
+                ) {
+
+                    paymentsTable.innerHTML = `
+                        <tr>
+                            <td
+                                colspan="6"
+                                class="text-center text-muted">
+
+                                No payments found.
+
+                            </td>
+                        </tr>
+                    `;
+
+                    document
+                        .getElementById(
+                            "reportTotalPayments"
+                        )
+                        .textContent = 0;
+
+                    document
+                        .getElementById(
+                            "reportTotalCollected"
+                        )
+                        .textContent = "₹0";
+
+                    document
+                        .getElementById(
+                            "reportTotalBalance"
+                        )
+                        .textContent = "₹0";
+
+                    document
+                        .getElementById(
+                            "reportPaidCount"
+                        )
+                        .textContent = 0;
+
+                    document
+                        .getElementById(
+                            "reportPartialCount"
+                        )
+                        .textContent = 0;
+
+                    document
+                        .getElementById(
+                            "reportPendingCount"
+                        )
+                        .textContent = 0;
+
+                    return;
+                }
+
+
+                // ==================================
+                // Calculate Summary
+                // ==================================
+
+                let totalCollected = 0;
+
+                let totalBalance = 0;
+
+                let paidCount = 0;
+
+                let partialCount = 0;
+
+                let pendingCount = 0;
+
+
+                payments.forEach(function(payment) {
+
+                    const paid =
+                        Number(
+                            payment.paidAmount ??
+                            payment.paid ??
+                            0
+                        );
+
+                    const balance =
+                        Number(
+                            payment.balance ??
+                            0
+                        );
+
+                    totalCollected += paid;
+
+                    totalBalance += balance;
+
+
+                    const status =
+                        String(
+                            payment.paymentStatus ||
+                            payment.status ||
+                            ""
+                        ).toUpperCase();
+
+
+                    if (status === "PAID") {
+
+                        paidCount++;
+
+                    }
+                    else if (
+                        status === "PARTIAL"
+                    ) {
+
+                        partialCount++;
+
+                    }
+                    else if (
+                        status === "PENDING"
+                    ) {
+
+                        pendingCount++;
+
+                    }
+
+                });
+
+
+                // ==================================
+                // Update Summary
+                // ==================================
+
+                document
+                    .getElementById(
+                        "reportTotalPayments"
+                    )
+                    .textContent =
+                    payments.length;
+
+
+                document
+                    .getElementById(
+                        "reportTotalCollected"
+                    )
+                    .textContent =
+                    "₹" +
+                    totalCollected.toFixed(2);
+
+
+                document
+                    .getElementById(
+                        "reportTotalBalance"
+                    )
+                    .textContent =
+                    "₹" +
+                    totalBalance.toFixed(2);
+
+
+                document
+                    .getElementById(
+                        "reportPaidCount"
+                    )
+                    .textContent =
+                    paidCount;
+
+
+                document
+                    .getElementById(
+                        "reportPartialCount"
+                    )
+                    .textContent =
+                    partialCount;
+
+
+                document
+                    .getElementById(
+                        "reportPendingCount"
+                    )
+                    .textContent =
+                    pendingCount;
+
+
+                // ==================================
+                // Display Payments
+                // ==================================
+
+                payments.forEach(function(payment) {
+
+                    const row =
+                        document.createElement("tr");
+
+
+                    const status =
+                        String(
+                            payment.paymentStatus ||
+                            payment.status ||
+                            "PENDING"
+                        ).toUpperCase();
+
+
+                    let statusBadge = "";
+
+
+                    if (status === "PAID") {
+
+                        statusBadge = `
+                            <span class="badge bg-success">
+                                PAID
+                            </span>
+                        `;
+
+                    }
+                    else if (
+                        status === "PARTIAL"
+                    ) {
+
+                        statusBadge = `
+                            <span class="badge bg-warning text-dark">
+                                PARTIAL
+                            </span>
+                        `;
+
+                    }
+                    else {
+
+                        statusBadge = `
+                            <span class="badge bg-danger">
+                                PENDING
+                            </span>
+                        `;
+
+                    }
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${payment.id ?? "-"}
+                        </td>
+
+                        <td>
+                            ${payment.studentId ?? "-"}
+                        </td>
+
+                        <td>
+                            ₹${Number(
+                                payment.totalFee ?? 0
+                            ).toFixed(2)}
+                        </td>
+
+                        <td>
+                            ₹${Number(
+                                payment.paidAmount ??
+                                payment.paid ??
+                                0
+                            ).toFixed(2)}
+                        </td>
+
+                        <td>
+                            ₹${Number(
+                                payment.balance ?? 0
+                            ).toFixed(2)}
+                        </td>
+
+                        <td>
+                            ${statusBadge}
+                        </td>
+
+                    `;
+
+
+                    paymentsTable.appendChild(row);
+
+                });
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Payment loading error:",
+                    error
+                );
+
+
+                const errorMessage =
+                    document.getElementById(
+                        "errorMessage"
+                    );
+
+
+                errorMessage.textContent =
+                    "Unable to load payments: " +
+                    error.message;
+
+
+                errorMessage.classList.remove(
+                    "d-none"
+                );
+
+            }
+
+        }
+        
+        // ==========================================
+        // Load Reports
+        // ==========================================
+
+        loadUserReport();
+        loadPaymentReport();
+
+
+
+    </script>
+
+
+</body>
+
+</html>

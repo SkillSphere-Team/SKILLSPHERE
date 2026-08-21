@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SkillSphere - Notifications</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <style>
+
+        body {
+            background: #f5f7fa;
+        }
+
+        .notification-card {
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .notification-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .unread {
+            border-left: 5px solid #0d6efd;
+            background: #eef5ff;
+        }
+
+        .read {
+            border-left: 5px solid #dee2e6;
+            background: white;
+        }
+
+        .notification-message {
+            white-space: pre-wrap;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar navbar-dark bg-primary">
+
+    <div class="container">
+
+        <span class="navbar-brand fw-bold">
+            SkillSphere - Notifications
+        </span>
+
+        <a href="/dashboard.html"
+           class="btn btn-light">
+            Dashboard
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- ================= MAIN CONTENT ================= -->
+
+<div class="container mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+                🔔 Notifications
+            </h2>
+
+            <p class="text-muted">
+                Stay updated with your SkillSphere activities.
+            </p>
+
+        </div>
+
+        <button
+            class="btn btn-outline-primary"
+            onclick="markAllAsRead()">
+
+            ✓ Mark All as Read
+
+        </button>
+
+    </div>
+
+
+    <!-- ================= UNREAD COUNT ================= -->
+
+    <div class="alert alert-info">
+
+        <strong id="unreadCount">
+            0
+        </strong>
+
+        unread notification(s)
+
+    </div>
+
+
+    <!-- ================= NOTIFICATIONS ================= -->
+
+    <div id="notificationContainer">
+
+        <div class="text-center text-muted p-5">
+
+            Loading notifications...
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* ==========================================
+   LOGIN CHECK
+========================================== */
+
+const accessToken =
+    localStorage.getItem("accessToken");
+
+const userData =
+    JSON.parse(localStorage.getItem("user"));
+
+if (!accessToken || !userData) {
+
+    window.location.href = "/login.html";
+
+}
+
+
+/* ==========================================
+   GET USER ID
+========================================== */
+
+const userId = userData.id || userData.userId;
+
+console.log("User data:", userData);
+console.log("Notification user ID:", userId);
+
+if (!userId) {
+    document.getElementById("notificationContainer").innerHTML = `
+        <div class="alert alert-danger">
+            User ID could not be found.
+        </div>
+    `;
+
+    throw new Error("User ID not found in localStorage");
+}
+
+/* ==========================================
+   LOAD NOTIFICATIONS
+========================================== */
+
+async function loadNotifications() {
+
+    try {
+
+        const response = await fetch(
+            `/api/notifications/user/${userId}`,
+            {
+                method: "GET",
+
+                headers: {
+                    "Authorization":
+                        "Bearer " + accessToken
+                }
+            }
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load notifications"
+            );
+
+        }
+
+
+        const notifications =
+            await response.json();
+
+
+        displayNotifications(
+            notifications
+        );
+
+
+        loadUnreadCount();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById(
+            "notificationContainer"
+        ).innerHTML = `
+
+            <div class="alert alert-danger">
+
+                Failed to load notifications.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* ==========================================
+   DISPLAY NOTIFICATIONS
+========================================== */
+
+function displayNotifications(
+    notifications
+) {
+
+    const container =
+        document.getElementById(
+            "notificationContainer"
+        );
+
+
+    if (notifications.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="card shadow-sm">
+
+                <div class="card-body text-center p-5">
+
+                    <h4>🎉 No Notifications</h4>
+
+                    <p class="text-muted mb-0">
+
+                        You're all caught up!
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    notifications.forEach(
+        notification => {
+
+            const card =
+                document.createElement("div");
+
+
+            card.className =
+                `card shadow-sm mb-3 notification-card ${
+                    notification.read
+                        ? "read"
+                        : "unread"
+                }`;
+
+
+            const date =
+                notification.createdAt
+                    ? new Date(
+                        notification.createdAt
+                    ).toLocaleString()
+                    : "";
+
+
+            card.innerHTML = `
+
+                <div class="card-body">
+
+                    <div class="d-flex
+                                justify-content-between
+                                align-items-start">
+
+                        <div>
+
+                            <h5 class="mb-2">
+
+                                ${getNotificationIcon(
+                                    notification.type
+                                )}
+
+                                ${escapeHtml(
+                                    notification.title
+                                )}
+
+                                ${
+                                    !notification.read
+                                    ? `
+                                    <span class="badge
+                                                 bg-primary
+                                                 ms-2">
+                                        NEW
+                                    </span>
+                                    `
+                                    : ""
+                                }
+
+                            </h5>
+
+                        </div>
+
+
+                        <span class="badge
+                                     ${getPriorityClass(
+                                         notification.priority
+                                     )}">
+
+                            ${notification.priority}
+
+                        </span>
+
+                    </div>
+
+
+                    <p class="text-muted mb-2">
+
+                        ${escapeHtml(
+                            notification.message
+                        )}
+
+                    </p>
+
+
+                    <div class="d-flex
+                                justify-content-between
+                                align-items-center">
+
+                        <small class="text-secondary">
+
+                            ${notification.type}
+                            •
+                            ${date}
+
+                        </small>
+
+
+                        ${
+                            !notification.read
+                            ? `
+                            <button
+                                class="btn btn-sm
+                                       btn-outline-primary"
+                                onclick="markAsRead(
+                                    ${notification.id}
+                                )">
+
+                                ✓ Mark as Read
+
+                            </button>
+                            `
+                            : `
+                            <span class="text-success">
+
+                                ✓ Read
+
+                            </span>
+                            `
+                        }
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(card);
+
+        }
+    );
+
+}
+
+
+/* ==========================================
+   UNREAD COUNT
+========================================== */
+
+async function loadUnreadCount() {
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/notifications/user/${userId}/unread/count`,
+                {
+                    headers: {
+                        "Authorization":
+                            "Bearer " + accessToken
+                    }
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load unread count"
+            );
+
+        }
+
+
+        const count =
+            await response.json();
+
+
+        document.getElementById(
+            "unreadCount"
+        ).textContent = count;
+
+
+    } catch (error) {
+
+        console.error(
+            "Unread count error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   MARK AS READ
+========================================== */
+
+async function markAsRead(id) {
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/notifications/${id}/read`,
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " + accessToken
+                    }
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to mark notification as read"
+            );
+
+        }
+
+
+        loadNotifications();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Failed to mark notification as read."
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   MARK ALL AS READ
+========================================== */
+
+async function markAllAsRead() {
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/notifications/user/${userId}`,
+                {
+                    headers: {
+                        "Authorization":
+                            "Bearer " + accessToken
+                    }
+                }
+            );
+
+
+        const notifications =
+            await response.json();
+
+
+        const unread =
+            notifications.filter(
+                notification =>
+                    !notification.read
+            );
+
+
+        for (const notification of unread) {
+
+            await fetch(
+                `/api/notifications/${notification.id}/read`,
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " + accessToken
+                    }
+                }
+            );
+
+        }
+
+
+        loadNotifications();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Failed to mark all notifications as read."
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   NOTIFICATION ICON
+========================================== */
+
+function getNotificationIcon(type) {
+
+    const icons = {
+
+        GENERAL: "🔔",
+
+        ANNOUNCEMENT: "📢",
+
+        PAYMENT_DUE: "💰",
+
+        CERTIFICATE_GENERATED: "🏆",
+
+        ASSIGNMENT_DEADLINE: "📝",
+
+        EXAM_SCHEDULED: "🧪",
+
+        EXAM_RESULT: "📊",
+
+        LOW_ATTENDANCE: "⚠️",
+
+        PASSWORD_RESET: "🔐",
+
+        BATCH_ANNOUNCEMENT: "📦"
+
+    };
+
+
+    return icons[type] || "🔔";
+
+}
+
+
+/* ==========================================
+   PRIORITY STYLE
+========================================== */
+
+function getPriorityClass(priority) {
+
+    switch (priority) {
+
+        case "URGENT":
+            return "bg-danger";
+
+        case "HIGH":
+            return "bg-warning text-dark";
+
+        case "LOW":
+            return "bg-secondary";
+
+        default:
+            return "bg-primary";
+
+    }
+
+}
+
+
+/* ==========================================
+   BASIC HTML ESCAPE
+========================================== */
+
+function escapeHtml(value) {
+
+    if (!value) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* ==========================================
+   INITIAL LOAD
+========================================== */
+
+loadNotifications();
+
+</script>
+
+</body>
+
+</html>

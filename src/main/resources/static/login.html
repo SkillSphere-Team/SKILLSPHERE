@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SkillSphere - Login</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <div class="container min-vh-100 d-flex justify-content-center align-items-center">
+
+        <div class="card shadow-lg border-0" style="max-width: 420px; width: 100%;">
+
+            <div class="card-body p-5">
+
+                <!-- Logo / Title -->
+                <div class="text-center mb-4">
+
+                    <h2 class="fw-bold">
+                        SkillSphere
+                    </h2>
+
+                    <p class="text-muted">
+                        Welcome back! Please login to continue.
+                    </p>
+
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm">
+
+                    <!-- Email -->
+                    <div class="mb-3">
+
+                        <label for="email" class="form-label">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="email"
+                            placeholder="Enter your email"
+                            required>
+
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+
+                        <label for="password" class="form-label">
+                            Password
+                        </label>
+
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="password"
+                            placeholder="Enter your password"
+                            required>
+
+                    </div>
+
+                    <!-- Error Message -->
+                    <div
+                        id="errorMessage"
+                        class="alert alert-danger d-none"
+                        role="alert">
+                    </div>
+
+                    <!-- Login Button -->
+                    <button
+                        type="submit"
+                        class="btn btn-primary w-100">
+                        Login
+                    </button>
+
+                </form>
+
+               <!-- Register -->
+<div class="text-center mt-4">
+    <span class="text-muted">
+        Don't have an account?
+    </span>
+
+    <a href="/register.html" class="text-decoration-none">
+        Register
+    </a>
+</div>
+    <script>
+
+        document
+            .getElementById("loginForm")
+            .addEventListener("submit", async function(event) {
+
+                event.preventDefault();
+
+                const email =
+                    document.getElementById("email").value;
+
+                const password =
+                    document.getElementById("password").value;
+
+                const errorMessage =
+                    document.getElementById("errorMessage");
+
+                errorMessage.classList.add("d-none");
+
+                try {
+
+                    const response = await fetch(
+                        "/api/auth/login",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                email: email,
+                                password: password
+                            })
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            data.message || "Login failed"
+                        );
+
+                    }
+
+                    // Store JWT
+                    localStorage.setItem(
+                        "accessToken",
+                        data.accessToken
+                    );
+
+                    // Store user information
+                    localStorage.setItem(
+                        "user",
+                        JSON.stringify(data)
+                    );
+
+                 // Get actual user details
+                    const profileResponse = await fetch(
+                        "/api/users/me",
+                        {
+                            method: "GET",
+                            headers: {
+                                "Authorization":
+                                    "Bearer " + data.accessToken,
+                                "Content-Type":
+                                    "application/json"
+                            }
+                        }
+                    );
+
+                    const profileData =
+                        await profileResponse.json();
+
+                    // Get roles
+                    const roles =
+                        profileData.roles || [];
+
+                    // Check Admin
+                    const isAdmin =
+                        roles.some(
+                            role =>
+                                role.toUpperCase() === "ADMIN" ||
+                                role.toUpperCase() === "ROLE_ADMIN"
+                        );
+
+                    // Redirect
+                    if (isAdmin) {
+
+                        window.location.href =
+                            "/admin-dashboard.html";
+
+                    } else {
+
+                        window.location.href =
+                            "/dashboard.html";
+                    }
+                } catch (error) {
+
+                    errorMessage.textContent =
+                        error.message;
+
+                    errorMessage.classList.remove(
+                        "d-none"
+                    );
+                }
+
+            });
+
+    </script>
+
+</body>
+
+</html>
